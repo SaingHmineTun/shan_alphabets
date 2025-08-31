@@ -1,19 +1,39 @@
-name: Deploy Flutter Web
+name: Flutter Web Deployment
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-      - run: flutter pub get
-      - run: flutter build web --release --base-href /shan_alphabets/
-      - run: touch build/web/.nojekyll
-      - uses: peaceiris/actions-gh-pages@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build web app
+        run: |
+          # For manual repository name (replace 'my-flutter-app' with your actual repo name)
+          flutter build web --release --base-href /my-flutter-app/
+
+      - name: Create necessary files
+        run: |
+          touch build/web/.nojekyll
+          # Optional: Add CNAME if you have custom domain
+          # echo "yourdomain.com" > build/web/CNAME
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
+          force_orphan: true
+          enable_jekyll: false
