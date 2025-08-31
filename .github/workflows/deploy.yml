@@ -1,8 +1,8 @@
-name: Flutter Web Deployment
+name: Deploy Flutter Web to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   build-and-deploy:
@@ -13,22 +13,17 @@ jobs:
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build web app
         run: |
-          # For manual repository name (replace 'my-flutter-app' with your actual repo name)
-          flutter build web --release --base-href /shan_proverbs/
+          # Replace 'your-repository-name' with your actual repository name
+          flutter build web --release --base-href /shan_alphabets/
 
-      - name: Create necessary files
-        run: |
-          touch build/web/.nojekyll
-          # Optional: Add CNAME if you have custom domain
-          # echo "yourdomain.com" > build/web/CNAME
+      - name: Create .nojekyll file
+        run: touch build/web/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -36,4 +31,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
           force_orphan: true
-          enable_jekyll: false
