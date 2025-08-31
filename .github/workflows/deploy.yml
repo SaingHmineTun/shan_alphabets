@@ -22,7 +22,7 @@ jobs:
       - name: Build web app
         run: |
           # For manual repository name (replace 'my-flutter-app' with your actual repo name)
-          flutter build web --release --base-href /shan_alphabets/
+          flutter build web --release --base-href /shan_proverbs/
 
       - name: Create necessary files
         run: |
