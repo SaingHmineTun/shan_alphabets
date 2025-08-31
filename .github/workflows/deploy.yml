@@ -1,18 +1,15 @@
-name: Deploy to GitHub Pages
+name: Deploy Flutter Web to GitHub Pages
 
 on:
   push:
-    branches: [ master ]  # Change to your default branch
-  pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -21,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Flutter
@@ -32,14 +29,23 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build web
-        run: flutter build web --release --base-href /shan_alphabets/
+      - name: Verify Flutter installation
+        run: flutter doctor
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
+      - name: Build web app
+        run: |
+          # Get repository name dynamically
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
+          flutter build web --release --base-href /$REPO_NAME/ --web-renderer html
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+      - name: Create .nojekyll file
+        run: touch build/web/.nojekyll
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: build/web
 
@@ -52,4 +58,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v3
